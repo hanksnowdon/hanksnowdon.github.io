@@ -94,7 +94,7 @@ analytics:
 # Site Author
 author:
   name             : "Hank Snowdon"
-  avatar           : # path of avatar image, e.g. "/assets/images/bio-photo.jpg"
+  avatar           : "/images/headshot.jpg" # path of avatar image, e.g. "/assets/images/bio-photo.jpg"
   bio              : "Data Science Portfolio"
   location         : "Columbus, OH"
   email            :
