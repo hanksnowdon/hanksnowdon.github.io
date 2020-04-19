@@ -68,6 +68,22 @@ combined_course_data = map_dfr(allfiles, map_fun)
 combined_course_data <- data_frame(combined_course_data) %>% select(!revised_skill) %>% arrange(course)
 combined_course_data
 ```
+```r
+## # A tibble: 19,620 x 6
+##    player_name rounds_played historical_true… versus_expected dg_adjustment
+##    <chr>               <int>            <dbl>           <dbl>         <dbl>
+##  1 Aaron, Tom…            50           -3.01            0.545       0.143  
+##  2 Huston, Jo…            50            1.57            0.626       0.164  
+##  3 Kuchar, Ma…            50            1.72            0.565       0.148  
+##  4 Adams, John             2           -2.39           -2.69       -0.0162
+##  5 Alexander,…             2           -0.567          NA           0      
+##  6 Armour III…             2           -2.07           -1.97       -0.0118
+##  7 Atwal, Arj…             2           -2.37           -1.68       -0.0101
+##  8 Baker, Pet…             2           -1.89           -2.14       -0.0129
+##  9 Bakst, Ken              2           -4.55           NA           0      
+## 10 Bard, Derek             2           -1.73            0.657       0.00394
+## # … with 19,610 more rows, and 1 more variable: course <chr>
+```
 
 To complete the dataset, I'd like to add a few more variables and clean things up.
 
