@@ -67,7 +67,7 @@ allfiles = list.files(path = here("golffiles"),
 
 Then, I write a function, map_fun, that combines all of the individual datasets. Multiple problems arise while writing the function, though:
 
-1. The variables `versus_expected` and `historical_true_sg` have `NA` values formatted as "N/A", which R reads as a character value. To fix this, I tell read_csv to read in the "N/A"s as R-friendly `NA`s, which forces all columns to be read in as numeric.
+1. The variables `versus_expected` and `historical_true_sg` have `NA` values formatted as "N/A", which R reads as a character value. To fix this, I tell read_csv to read in the "N/A"s as R-friendly `NA`s, which forces all columns to be read in as numeric values.
 
 2. When combining the data, the identifying information for each course disappears. To identify which data comes from what course, I first create `splitnames`, which splits the file path for each dataset. By setting course = the eighth element of `splitnames`, I create a variable that identifies each course.
 
@@ -81,7 +81,7 @@ map_fun = function(path) {
 }
 ```
 
-Now that the function is created to read and correctly format each dataset, I use the map_dfr function to combine them. I get rid of the extraneous `revised_skill` variable, and are left with one combined dataset.
+Now that the function is created to read and correctly format each dataset, I use the map_dfr function to combine them. I get rid of the extraneous `revised_skill` variable, and am left with one combined dataset.
 
 ```r
 combined_course_data = map_dfr(allfiles, map_fun)
