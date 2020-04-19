@@ -6,7 +6,6 @@ header:
   image: "/images/The_Masters.jpg"
 excerpt: "Data Cleaning example"
 ---
-
 ## Introduction
 
 In this project, I will tackle a problem of messy, untidy data — cleaning and combining it using R in order for it to be analyzed.
@@ -32,7 +31,7 @@ library(purrr)
 library(knitr)
 Augusta <- read_csv("augusta_national_gc_CH.csv", col_types = cols())
 tibble(Augusta)
-
+```
 
 
 ```r
