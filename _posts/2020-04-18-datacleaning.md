@@ -7,10 +7,6 @@ header:
 excerpt: "Data Cleaning example"
 ---
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
-```
-
 # Cleaning Data
 
 In this project, I will tackle a problem of messy, untidy data — cleaning and combining it using R in order for it to be analyzed.
