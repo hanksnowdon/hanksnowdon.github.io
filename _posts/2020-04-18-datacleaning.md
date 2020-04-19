@@ -3,7 +3,7 @@ title: "Data Cleaning Project: Golf Pool Dataset"
 date: 2020-04-18
 tags: [data cleaning, data science]
 header:
-  image:
+  image: "/images/The_Masters.jpg"
 excerpt: "Data Cleaning example"
 ---
 
