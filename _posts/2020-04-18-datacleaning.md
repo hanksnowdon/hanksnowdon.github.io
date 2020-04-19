@@ -16,7 +16,7 @@ There are two main keys to doing well in the pool — choosing golfers that will
 
 ## datagolf.org
 
-The folks at [datagolf.org](https://datagolf.org) have a Course History Tool that helps break down the two most pressing issues — where golfers show up, and where they play well. For most of the tournaments in the season (missing a few that are newer/aren't affiliated with the PGA) they have datasets available for each golfer that has ever played the course professionally.
+The folks at [datagolf.org](https://datagolf.org){: .btn .btn--primary} have a Course History Tool that helps break down the two most pressing issues — where golfers show up, and where they play well. For most of the tournaments in the season (missing a few that are newer/aren't affiliated with the PGA) they have datasets available for each golfer that has ever played the course professionally.
 
 The metrics include number of rounds played, average adjusted strokes-gained, average strokes-gained relative to baseline skill level, and a strokes-gained per round adjustment for the course. The stroked-gained adjustment is a function of the # of rounds a golfer has played and their historical SG relative to baseline.
 
