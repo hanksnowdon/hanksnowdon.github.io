@@ -1,5 +1,5 @@
 ---
-title: "Data Cleaning Project: Golf Pool Dataset"
+title: "Cleaning Data: Golf Pool Dataset"
 date: 2020-04-18
 tags: [data cleaning, data science]
 header:
@@ -7,13 +7,15 @@ header:
 excerpt: "Data Cleaning example"
 ---
 
-# Cleaning Data
+## Introduction
 
 In this project, I will tackle a problem of messy, untidy data — cleaning and combining it using R in order for it to be analyzed.
 
 Every year I participate in a professional golf pool, where the participants choose one golfer for each tournament of the golf season. At the end of the year, the player with the highest sum of tournament winnings for the golfers they chose at each event wins the pool. The only rule is that no golfer can be chosen twice.
 
 There are two main keys to doing well in the pool — choosing golfers that will show up at each event, and choosing golfers that traditionally perform well at specific courses. On top of this, some tournaments have much higher purses and are much more valuable to the pool — you want to have your best golfers chosen for the higher-prize tournaments.
+
+## Datagolf
 
 The folks at [link](https://datagolf.org) have a Course History Tool that helps break down the two most pressing issues — where golfers show up, and where they play well. For most of the tournaments in the season (missing a few that are newer/aren't affiliated with the PGA) they have datasets available for each golfer that has ever played the course professionally.
 
@@ -33,6 +35,8 @@ tibble(Augusta)
 ```
 
 By bringing all of these course sets together, it becomes easy to see where a golfer plays the best, the worst, the most, and the least. However, a number of problems exist that prevent this data from initially being analyzed. For one, the course data is all in seperate files.
+
+## Combining many datasets
 
 After downloading all the files, we will combine them on top of eachother. First, we get a list of all the file paths:
 
@@ -85,37 +89,7 @@ combined_course_data
 ## # … with 19,610 more rows, and 1 more variable: course <chr>
 ```
 
-```
-## # A tibble: 19,620 x 6
-##    player_name rounds_played historical_true… versus_expected dg_adjustment
-##    <chr>               <int>            <dbl>           <dbl>         <dbl>
-##  1 Aaron, Tom…            50           -3.01            0.545       0.143  
-##  2 Huston, Jo…            50            1.57            0.626       0.164  
-##  3 Kuchar, Ma…            50            1.72            0.565       0.148  
-##  4 Adams, John             2           -2.39           -2.69       -0.0162
-##  5 Alexander,…             2           -0.567          NA           0      
-##  6 Armour III…             2           -2.07           -1.97       -0.0118
-##  7 Atwal, Arj…             2           -2.37           -1.68       -0.0101
-##  8 Baker, Pet…             2           -1.89           -2.14       -0.0129
-##  9 Bakst, Ken              2           -4.55           NA           0      
-## 10 Bard, Derek             2           -1.73            0.657       0.00394
-## # … with 19,610 more rows, and 1 more variable: course <chr>
-```
-
-## # A tibble: 19,620 x 6
-##    player_name rounds_played historical_true… versus_expected dg_adjustment
-##    <chr>               <int>            <dbl>           <dbl>         <dbl>
-##  1 Aaron, Tom…            50           -3.01            0.545       0.143  
-##  2 Huston, Jo…            50            1.57            0.626       0.164  
-##  3 Kuchar, Ma…            50            1.72            0.565       0.148  
-##  4 Adams, John             2           -2.39           -2.69       -0.0162
-##  5 Alexander,…             2           -0.567          NA           0      
-##  6 Armour III…             2           -2.07           -1.97       -0.0118
-##  7 Atwal, Arj…             2           -2.37           -1.68       -0.0101
-##  8 Baker, Pet…             2           -1.89           -2.14       -0.0129
-##  9 Bakst, Ken              2           -4.55           NA           0      
-## 10 Bard, Derek             2           -1.73            0.657       0.00394
-## # … with 19,610 more rows, and 1 more variable: course <chr>
+## Joining other variables
 
 To complete the dataset, I'd like to add a few more variables and clean things up.
 
@@ -128,13 +102,17 @@ worldGolf <- read_csv("wrldgolfrank2020.csv", col_types = cols())
 tibble(worldGolf)
 ```
 
-The names clearly aren't in the format we want — in combined_course_data the player_names are formatted as "last, first". We will mutate the player_name column to make them "First Last".
+### Mutating keys
+
+To join the two tables, we'll need a key that brings the variables together, in this case the players' names. However, the names clearly aren't formatted the same way — in combined_course_data the player_names are formatted as "Last, First". We will mutate the player_name column to make them "First Last".
 
 ```r
 combined_course_data <- combined_course_data %>% separate(player_name, into = c("last", "first"), sep = ",\\s")
 combined_course_data <- unite(combined_course_data, Name, first, last, sep = " ", remove = TRUE)
 combined_course_data
 ```
+
+### Join and filter
 
 Now we join the worldGolf rank data with combined_course_data, filtering for the top 200 golfers.
 
