@@ -16,7 +16,7 @@ There are two main keys to doing well in the pool — choosing golfers that will
 
 ## datagolf.org
 
-The folks at [datagolf.org](https://datagolf.org){: .btn .btn--primary} have a Course History Tool that helps break down the two most pressing issues — where golfers show up, and where they play well. For most of the tournaments in the season (missing a few that are newer/aren't affiliated with the PGA) they have datasets available for each golfer that has ever played the course professionally.
+The folks at [datagolf.org](https://datagolf.org) have a Course History Tool that helps break down the two most pressing issues — where golfers show up, and where they play well. For most of the tournaments in the season (missing a few that are newer/aren't affiliated with the PGA) they have datasets available for each golfer that has ever played the course professionally.
 
 The metrics include number of rounds played, average adjusted strokes-gained, average strokes-gained relative to baseline skill level, and a strokes-gained per round adjustment for the course. The stroked-gained adjustment is a function of the # of rounds a golfer has played and their historical SG relative to baseline.
 
@@ -52,11 +52,11 @@ tibble(Augusta)
 ```
 
 
-If we could bring all of these course sets together, we could then create models to estimate where a golfer plays the best, the worst, the most, and the least. However, a number of problems exist that prevent this data from initially being analyzed. For one, the course data is all in separate files.
+If I could bring all of these course sets together, I could then create models to estimate where a golfer plays the best, the worst, the most, and the least. However, a number of problems exist that prevent this data from initially being analyzed. For one, the course data is all in separate files.
 
 ## Combining many datasets
 
-After downloading all the files, we will combine them on top of each other. First, we get a list of all the file paths:
+After downloading all the files, I will combine them on top of each other. First, I get a list of all the file paths:
 
 ```r
 allfiles = list.files(path = here("golffiles"),
@@ -65,25 +65,23 @@ allfiles = list.files(path = here("golffiles"),
                         recursive = TRUE)
 ```
 
-Then, we write a function, map_fun, that combines all of the individual datasets. Multiple problems arise while writing the function, though:
+Then, I write a function, map_fun, that combines all of the individual datasets. Multiple problems arise while writing the function, though:
 
-1. The variables `versus_expected` and `historical_true_sg` have NA values formatted as "N/A", which R reads as a character value. Since not all courses have "N/A" values for `versus_expected` or `historical_true_sg`, some of the course datasets interpret the columns as a characters, while some interpret them as numeric. The datasets won't combine when the formats aren't the same, so to combat this, we replace the "N/A"s with R-friendly NAs and reformat the columns as numeric. Now all the `versus_expected` and `historical_true_sg` columns will combine.
+1. The variables `versus_expected` and `historical_true_sg` have `NA` values formatted as "N/A", which R reads as a character value. To fix this, I tell read_csv to read in the "N/A"s as R-friendly `NA`s, which forces all columns to be read in as numeric.
 
-2. When combining the data, the identifying information for each course disappears. To identify which data comes from what course, we first create `splitnames`, which splits the file path for each dataset. By setting course = the eighth element of `splitnames`, we create a variable that identifies each course.
+2. When combining the data, the identifying information for each course disappears. To identify which data comes from what course, I first create `splitnames`, which splits the file path for each dataset. By setting course = the eighth element of `splitnames`, I create a variable that identifies each course.
+
 
 ```r
 map_fun = function(path) {
-     data <- read.csv(path, header = TRUE, stringsAsFactors=FALSE)
-     data <- mutate(data, versus_expected = replace(versus_expected, versus_expected == "N/A", NA), historical_true_sg = replace(historical_true_sg, historical_true_sg == "N/A", NA))
-     data$versus_expected <- as.numeric(as.character(data$versus_expected))
-     data$historical_true_sg <- as.numeric(as.character(data$historical_true_sg))
-     splitnames = str_split(path, pattern = "/", simplify = TRUE)
+     data <- read.csv(path, header = TRUE, stringsAsFactors=FALSE, na = c("N/A", "NA"))
+     splitnames <- str_split(path, pattern = "/", simplify = TRUE)
      data <- mutate(data, course = splitnames[8])
      data
 }
 ```
 
-Now that the function is created to read and correctly format each dataset, we use the map_dfr function to combine them. We get rid of the extraneous `revised_skill` variable, and are left with one combined dataset.
+Now that the function is created to read and correctly format each dataset, I use the map_dfr function to combine them. I get rid of the extraneous `revised_skill` variable, and are left with one combined dataset.
 
 ```r
 combined_course_data = map_dfr(allfiles, map_fun)
@@ -111,7 +109,7 @@ combined_course_data
 
 To complete the dataset, I'd like to add a few more variables and clean things up.
 
-First we'll add the 2020 world golf ranking for each player — only keeping the top 200 players. With only 34 tournaments to choose, I'd like to limit the results to the top 200 golfers.
+First I'll add the 2020 world golf ranking for each player — only keeping the top 200 players. With only 34 tournaments to choose, I'd like to limit the results to the top 200 golfers.
 
 By copying and pasting into an Excel file, I created a csv file of the top 200 of the WGR, titled `wrldgolfrank2020.csv`.
 
@@ -140,7 +138,7 @@ tibble(worldGolf)
 
 ### Mutating keys
 
-To join the two tables, we'll need a key that brings the variables together, in this case the players' names. However, the names clearly aren't formatted the same way — in combined_course_data the player_names are formatted as "Last, First". We will mutate the player_name column to make them "First Last".
+To join the two tables, I'll need a key that brings the variables together, in this case the players' names. However, the names clearly aren't formatted the same way — in combined_course_data the player_names are formatted as "Last, First". I will mutate the player_name column to make them "First Last".
 
 ```r
 combined_course_data <- combined_course_data %>% separate(player_name, into = c("last", "first"), sep = ",\\s")
@@ -167,7 +165,7 @@ combined_course_data
 
 ### Join and filter
 
-Now we join the worldGolf rank data with combined_course_data, filtering for the top 200 golfers.
+Now I join the worldGolf rank data with combined_course_data, filtering for the top 200 golfers.
 
 ```r
 combined_course_data <- combined_course_data %>% left_join(worldGolf, by = "Name") %>% filter(Rank < 201)
