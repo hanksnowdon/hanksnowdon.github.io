@@ -102,13 +102,13 @@ fit <-  train(
 )
 print(fit)
 
+
+# Optimal hyperparameters were mtry = 5, min.node.size = 3
 ```
 
 ### Training model
 
 With the above hyperparameters I created the final random forest specification, and verified its performance on my separate testing set.
-
-
 
 ```r
 
@@ -124,9 +124,7 @@ modelfinal <- ranger(
   seed = 1234)
 
 
-
-
-predicts <- predict(modelfinalquestionmark, data = _test)
+predicts <- predict(modelfinalquestionmark, data = df_test)
 
 table(df_test$is_swing, predicts1$predictions)
 
