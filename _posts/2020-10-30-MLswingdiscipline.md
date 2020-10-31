@@ -376,9 +376,91 @@ df_p2_fa <- df_p2 %>% filter(pitch_type == "FA")
 logit100fa <- glm(is_swing ~ as.factor(pitcher_side) + as.factor(batter_side) + as.factor(outs) + as.factor(count) + zone_speed + induced_vert_break + abs(horz_break) + abs(plate_height - 2.55) + abs(plate_side) + rel_height + abs(rel_side) + extension + vert_approach_angle + abs(horz_approach_angle) + as.factor(recent_callup100), data = df_p2_fa, family = "binomial")
 
 summary(logit100fa)
+
+Call:
+glm(formula = is_swing ~ as.factor(pitcher_side) + as.factor(batter_side) +
+    as.factor(outs) + as.factor(count) + zone_speed + induced_vert_break +
+    abs(horz_break) + abs(plate_height - 2.55) + abs(plate_side) +
+    rel_height + abs(rel_side) + extension + vert_approach_angle +
+    abs(horz_approach_angle) + as.factor(recent_callup100), family = "binomial",
+    data = df_p2_fa)
+
+Deviance Residuals:
+    Min       1Q   Median       3Q      Max  
+-2.8758  -0.7798  -0.1392   0.7819   6.3408  
+
+Coefficients:
+                                 Estimate Std. Error  z value Pr(>|z|)    
+(Intercept)                      6.859747   0.124760   54.983  < 2e-16 ***
+as.factor(pitcher_side)RHP       0.108765   0.008140   13.362  < 2e-16 ***
+as.factor(batter_side)Right      0.067203   0.006875    9.774  < 2e-16 ***
+as.factor(batter_side)S          1.122767   1.282724    0.875    0.381    
+as.factor(outs)1                 0.053678   0.008163    6.576 4.84e-11 ***
+as.factor(outs)2                 0.056459   0.008290    6.810 9.74e-12 ***
+as.factor(outs)3                -0.314573   0.644767   -0.488    0.626    
+as.factor(count)0-1              1.033245   0.012281   84.133  < 2e-16 ***
+as.factor(count)0-2              1.609061   0.016056  100.217  < 2e-16 ***
+as.factor(count)1-0              0.685201   0.011805   58.043  < 2e-16 ***
+as.factor(count)1-1              1.239317   0.013115   94.493  < 2e-16 ***
+as.factor(count)1-2              1.781900   0.014501  122.884  < 2e-16 ***
+as.factor(count)2-0              0.635401   0.016139   39.371  < 2e-16 ***
+as.factor(count)2-1              1.371385   0.015189   90.289  < 2e-16 ***
+as.factor(count)2-2              1.946853   0.014956  130.176  < 2e-16 ***
+as.factor(count)3-0             -1.844073   0.033325  -55.336  < 2e-16 ***
+as.factor(count)3-1              1.153716   0.019014   60.678  < 2e-16 ***
+as.factor(count)3-2              2.157658   0.016658  129.528  < 2e-16 ***
+zone_speed                      -0.050921   0.001330  -38.292  < 2e-16 ***
+induced_vert_break              -0.061300   0.001053  -58.234  < 2e-16 ***
+abs(horz_break)                 -0.009922   0.000965  -10.283  < 2e-16 ***
+abs(plate_height - 2.55)        -2.135521   0.008271 -258.208  < 2e-16 ***
+abs(plate_side)                 -2.477219   0.009019 -274.657  < 2e-16 ***
+rel_height                       0.493782   0.009673   51.050  < 2e-16 ***
+abs(rel_side)                    0.070237   0.006152   11.417  < 2e-16 ***
+extension                       -0.093928   0.007308  -12.853  < 2e-16 ***
+vert_approach_angle              0.390999   0.004446   87.935  < 2e-16 ***
+abs(horz_approach_angle)        -0.126821   0.004717  -26.886  < 2e-16 ***
+as.factor(recent_callup100)TRUE -0.004018   0.021993   -0.183    0.855    
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+(Dispersion parameter for binomial family taken to be 1)
+
+    Null deviance: 759404  on 548929  degrees of freedom
+Residual deviance: 529117  on 548901  degrees of freedom
+  (279 observations deleted due to missingness)
+AIC: 529175
+
+Number of Fisher Scoring iterations: 5
+
 pdata2 <- predict(logit100fa, newdata = df_p2_fa, type = "response")
 confusionMatrix(data = as.factor(as.numeric(pdata2>0.5)), reference = df_p2_fa$is_swing)
 
+Confusion Matrix and Statistics
+
+          Reference
+Prediction      0      1
+         0 221753  61124
+         1  67407 198646
+
+               Accuracy : 0.7659         
+                 95% CI : (0.7647, 0.767)
+    No Information Rate : 0.5268         
+    P-Value [Acc > NIR] : < 2.2e-16      
+
+                  Kappa : 0.5309         
+
+ Mcnemar's Test P-Value : < 2.2e-16      
+
+            Sensitivity : 0.7669         
+            Specificity : 0.7647         
+         Pos Pred Value : 0.7839         
+         Neg Pred Value : 0.7466         
+             Prevalence : 0.5268         
+         Detection Rate : 0.4040         
+   Detection Prevalence : 0.5153         
+      Balanced Accuracy : 0.7658         
+
+       'Positive' Class : 0              
 ```
 
 When considering only fastballs, accuracy jumps to 76.59%. Being recently called up is certainly not statistically significant, with a p-value of .855.
