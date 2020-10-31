@@ -133,6 +133,11 @@ df %>% group_by(batter_side) %>% summarise(ct = n())
 # Remove outliers
 df <-  df %>% filter(batter_side != "S")
 
+```
+
+Then we construct the recently called-up variable, which is true if promotion occurred in last 100 pitches and the player hasn't been sent back down yet.
+
+```r
 library(cleandata)
 library(roll)
 library(caret)
@@ -143,16 +148,18 @@ df$level[df$level == "A+"] <- 2
 df$level[df$level == "A"] <- 1
 df$level <- as.integer(df$level)
 
+df <- df %>% arrange(batter_id, date) %>% mutate(
+  callup = if_else(lag(level, k = 1) < level, if_else(lag(batter_id, k = 1) == batter_id, 1, 0), 0)) %>% mutate(
+    sentdown = if_else(lag(level, k = 1) > level, if_else(lag(batter_id, k = 1) == batter_id, 1, 0), 0)) %>%  mutate(
+      sum_callup= ifelse(lag(batter_id, k = 1) == batter_id, roll::roll_sum(callup, width = 100, min_obs = 1), 998)) %>%  mutate(
+        sum_sentdown= ifelse(lag(batter_id, k = 1) == batter_id, roll::roll_sum(sentdown, width = 100, min_obs = 1), 999)) %>%  mutate(
+          strk_sum_c =sequence(rle(sum_callup)$lengths)) %>%  mutate(
+            strk_sum_s =sequence(rle(sum_sentdown)$lengths)) %>% mutate(
+              recent_callup100 = ifelse(sum_callup > sum_sentdown, TRUE, ifelse(sum_sentdown > sum_callup, FALSE, ifelse(sum_callup == 0, FALSE, ifelse(strk_sum_c > strk_sum_s, FALSE, TRUE)))))
+
 ```
 
-Then we construct the recently called-up variable, which is true if promotion occurred in last 100 pitches and the player hasn't been sent back down yet.
-
-```r
-df <- df %>% arrange(batter_id, date) %>% mutate(callup = if_else(lag(level, k = 1) < level, if_else(lag(batter_id, k = 1) == batter_id, 1, 0), 0)) %>% mutate(sentdown = if_else(lag(level, k = 1) > level, if_else(lag(batter_id, k = 1) == batter_id, 1, 0), 0)) %>%  mutate(sum_callup= ifelse(lag(batter_id, k = 1) == batter_id, roll::roll_sum(callup, width = 100, min_obs = 1), 998)) %>%  mutate(sum_sentdown= ifelse(lag(batter_id, k = 1) == batter_id, roll::roll_sum(sentdown, width = 100, min_obs = 1), 999)) %>%  mutate(strk_sum_c =sequence(rle(sum_callup)$lengths)) %>%  mutate(strk_sum_s =sequence(rle(sum_sentdown)$lengths)) %>% mutate(recent_callup100 = ifelse(sum_callup > sum_sentdown, TRUE, ifelse(sum_sentdown > sum_callup, FALSE, ifelse(sum_callup == 0, FALSE, ifelse(strk_sum_c > strk_sum_s, FALSE, TRUE)))))
-
-```
-
-### Identify highly correlated variables to omit from model
+We then identify highly correlated variables to omit from model
 
 ```r
 numerics <- sapply(df_p2, is.numeric)
@@ -166,8 +173,14 @@ print(high_cor)
 
 ```
 ### Initial specification
+
+After removing these variables, we initially run a logit model on all of the variables in the dataset.
+
 ```r
-logit100 <- glm(is_swing ~ as.factor(pitcher_side) + as.factor(batter_side) + as.factor(outs) + as.factor(count) + zone_speed + induced_vert_break + horz_break + plate_height + plate_side + as.factor(pitch_type)  + rel_height + rel_side + rel_height + extension + vert_release_angle + vert_approach_angle + horz_approach_angle + as.factor(recent_callup100), data = df_p2, family = "binomial")
+logit100 <- glm(
+  is_swing ~ as.factor(pitcher_side) + as.factor(batter_side) + as.factor(outs) + as.factor(count) + zone_speed + induced_vert_break + horz_break + plate_height + plate_side + as.factor(pitch_type)  + rel_height + rel_side + rel_height + extension + vert_release_angle + vert_approach_angle + horz_approach_angle + as.factor(recent_callup100),
+  data = df_p2,
+  family = "binomial")
 summary(logit100)
 
 Call:
@@ -234,8 +247,8 @@ AIC: 1440590
 
 Number of Fisher Scoring iterations: 5
 
-pdata2 <- predict(logit100, newdata = df_p2, type = "response")
-confusionMatrix(data = as.factor(as.numeric(pdata2>0.5)), reference = df_p2$is_swing)
+pdata1 <- predict(logit100, newdata = df_p2, type = "response")
+confusionMatrix(data = as.factor(as.numeric(pdata1>0.5)), reference = df_p2$is_swing)
 
 Confusion Matrix and Statistics
 
@@ -272,7 +285,10 @@ Results indicate that being called up in the last 100 pitches is significant at 
 We now try a number of ways to improve the model. First we take the absolute value of all horizontal break and location measures to accurately account for pitcher handedness. Next we normalize plate_height to distance from the y-center of the zone.
 
 ```r
-logit100updated <- glm(is_swing ~ as.factor(pitcher_side) + as.factor(batter_side) + as.factor(outs) + as.factor(count) + zone_speed + induced_vert_break + abs(horz_break) + abs(plate_height - 2.55) + abs(plate_side) + as.factor(pitch_type)  + rel_height + abs(rel_side)  + extension + vert_approach_angle + abs(horz_approach_angle) + as.factor(recent_callup100), data = df_p2, family = "binomial")
+logit100updated <- glm(
+  is_swing ~ as.factor(pitcher_side) + as.factor(batter_side) + as.factor(outs) + as.factor(count) + zone_speed + induced_vert_break + abs(horz_break) + abs(plate_height - 2.55) + abs(plate_side) + as.factor(pitch_type)  + rel_height + abs(rel_side)  + extension + vert_approach_angle + abs(horz_approach_angle) + as.factor(recent_callup100),
+  data = df_p2,
+  family = "binomial")
 summary(logit100updated)
 
 Call:
@@ -377,7 +393,10 @@ In a final attempt to improve the model, we partition based on pitch_type.
 
 ```r
 df_p2_fa <- df_p2 %>% filter(pitch_type == "FA")
-logit100fa <- glm(is_swing ~ as.factor(pitcher_side) + as.factor(batter_side) + as.factor(outs) + as.factor(count) + zone_speed + induced_vert_break + abs(horz_break) + abs(plate_height - 2.55) + abs(plate_side) + rel_height + abs(rel_side) + extension + vert_approach_angle + abs(horz_approach_angle) + as.factor(recent_callup100), data = df_p2_fa, family = "binomial")
+logit100fa <- glm(
+  is_swing ~ as.factor(pitcher_side) + as.factor(batter_side) + as.factor(outs) + as.factor(count) + zone_speed + induced_vert_break + abs(horz_break) + abs(plate_height - 2.55) + abs(plate_side) + rel_height + abs(rel_side) + extension + vert_approach_angle + abs(horz_approach_angle) + as.factor(recent_callup100),
+  data = df_p2_fa,
+  family = "binomial")
 
 summary(logit100fa)
 
@@ -386,7 +405,8 @@ glm(formula = is_swing ~ as.factor(pitcher_side) + as.factor(batter_side) +
     as.factor(outs) + as.factor(count) + zone_speed + induced_vert_break +
     abs(horz_break) + abs(plate_height - 2.55) + abs(plate_side) +
     rel_height + abs(rel_side) + extension + vert_approach_angle +
-    abs(horz_approach_angle) + as.factor(recent_callup100), family = "binomial",
+    abs(horz_approach_angle) + as.factor(recent_callup100),
+    family = "binomial",
     data = df_p2_fa)
 
 Deviance Residuals:
@@ -436,8 +456,8 @@ AIC: 529175
 
 Number of Fisher Scoring iterations: 5
 
-pdata2 <- predict(logit100fa, newdata = df_p2_fa, type = "response")
-confusionMatrix(data = as.factor(as.numeric(pdata2>0.5)), reference = df_p2_fa$is_swing)
+pdata3 <- predict(logit100fa, newdata = df_p2_fa, type = "response")
+confusionMatrix(data = as.factor(as.numeric(pdata3>0.5)), reference = df_p2_fa$is_swing)
 
 Confusion Matrix and Statistics
 
@@ -469,11 +489,14 @@ Prediction      0      1
 
 When considering only fastballs, accuracy jumps to 76.59%. Being recently called up is certainly not statistically significant, with a p-value of .855.
 
-We now try the other pitch types to see if recently called up batters' swing discipline is different for some pitches. The other pitch models all have similar accuracy rates, but sure enough, we do see a significantly positive effect of recently being called up on swings for change-ups only.  
+We now try the other pitch types to see if recently called up batters' swing discipline is different for some pitches. The other pitch models all have similar accuracy rates, but sure enough, we do see a significantly positive effect of recently being called up on swings for change-ups only:
 
 ```r
 df_p2_ch <- df_p2 %>% filter(pitch_type == "CH") #change-ups
-logit100ch <- glm(is_swing ~ as.factor(pitcher_side) + as.factor(batter_side) + as.factor(outs) + as.factor(count) + zone_speed + induced_vert_break + abs(horz_break) + abs(plate_height - 2.55) + abs(plate_side) + rel_height + abs(rel_side) + extension + vert_approach_angle + abs(horz_approach_angle) + as.factor(recent_callup100), data = df_p2_ch, family = "binomial")
+logit100ch <- glm(
+  is_swing ~ as.factor(pitcher_side) + as.factor(batter_side) + as.factor(outs) + as.factor(count) + zone_speed + induced_vert_break + abs(horz_break) + abs(plate_height - 2.55) + abs(plate_side) + rel_height + abs(rel_side) + extension + vert_approach_angle + abs(horz_approach_angle) + as.factor(recent_callup100),
+  data = df_p2_ch,
+  family = "binomial")
 summary(logit100ch)
 
 Call:
@@ -532,8 +555,8 @@ AIC: 138821
 
 Number of Fisher Scoring iterations: 8
 
-pdata2 <- predict(logit100ch, newdata = df_p2_ch, type = "response")
-confusionMatrix(data = as.factor(as.numeric(pdata2>0.5)), reference = df_p2_ch$is_swing)
+pdata4 <- predict(logit100ch, newdata = df_p2_ch, type = "response")
+confusionMatrix(data = as.factor(as.numeric(pdata4>0.5)), reference = df_p2_ch$is_swing)
 
 Confusion Matrix and Statistics
 
