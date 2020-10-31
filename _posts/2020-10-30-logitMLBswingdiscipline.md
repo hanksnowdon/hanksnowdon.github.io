@@ -1,10 +1,10 @@
 ---
 title: "Does getting called up lead to change in swing discipline for baseball players?"
 date: 2020-10-30
-tags: [Logistic Classification, Data Science, Baseball]
+tags: [Modeling
 header:
   image: "/images/Brewers.png"
-excerpt: "Modeling the effect of promotion on swing patterns of hitters"
+excerpt: "Modeling the short-term effect of promotion on hitters' swing patterns "
 ---
 
 ## Background
@@ -30,13 +30,17 @@ strikex <- c(-.95,.95,.95,-.95,-.95)
 strikez <- c(1.6,1.6,3.5,3.5,1.6)
 zone <- data.frame(strikex,strikez)
 
-ggplot() + geom_path(data = zone, aes(x=strikex, y=strikez)) + coord_equal() + geom_point(data = (df %>% filter(batter_id == "007bc3de")), aes(x = plate_side, y = plate_height, shape = pitch_type, color = is_swing)) + scale_size(range = c(-1.0,2.5)) +  facet_grid(. ~ pitcher_side) + labs(
+ggplot() + geom_path(data = zone, aes(x=strikex, y=strikez)) + coord_equal() + geom_point(
+  data = (df %>% filter(batter_id == "007bc3de")),
+  aes(x = plate_side, y = plate_height, shape = pitch_type, color = is_swing)) + scale_size(range = c(-1.0,2.5)) +  facet_grid(. ~ pitcher_side) + labs(
        color = "Swing",
        title = "Batter 007bc3de Swing Chart ",
        subtitle = "2019-04-01 - 2019-06-30") +
        ylab("Feet from ground") +
-       xlab("Feet from center of plate") +   theme(panel.background = element_rect(fill = "white")) + theme(panel.grid.major.y = element_line(color = "#bad0d0", size = .4)) +
-  theme(panel.grid.major.x = element_line(color = "#bdd0d0", size = .4))
+       xlab("Feet from center of plate") +   theme(panel.background = element_rect(fill = "white")) + theme(
+         panel.grid.major.y = element_line(color = "#bad0d0", size = .4)) +
+  theme(
+    panel.grid.major.x = element_line(color = "#bdd0d0", size = .4))
 ```
 
 <img src="{{ site.url }}{{ site.baseurl }}/images/strikezone" alt="strike zone tag">
