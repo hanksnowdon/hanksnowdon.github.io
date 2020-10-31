@@ -13,12 +13,13 @@ With Trackman pitch-tracking data, more baseball information is available than e
 Today, I'll try to use that information to best predict whether a batter will swing at a given pitch.
 
 
-###Initial variable construction and data cleaning
+## Initial variable construction and data cleaning
 
-I first loaded the data, cleaned out some erroneous observations and made a categorical variable for count.
+I first loaded the data, cleaned out some erroneous observations and made a categorical variable for count and swing.
 
 ```r
-df <- df %>% mutate(is_swing = as.factor(as.integer((pitch_call == "FoulBall" | pitch_call == "InPlay" | pitch_call == "StrikeSwinging"))))
+df <- df %>% mutate(is_swing = as.factor(as.integer((
+  pitch_call == "FoulBall" | pitch_call == "InPlay" | pitch_call == "StrikeSwinging"))))
 df <- df %>% unite(col = count, balls, strikes, sep = "-") %>% drop_na()
 
 # Check counts
@@ -36,11 +37,11 @@ df %>% group_by(batter_side) %>% summarise(ct = n())
 # Remove outliers
 df <-  df %>% filter(batter_side != "S")
 ```
-### Identify highly correlated variables
+## Identify highly correlated variables
 
 Then, I built a correlation matrix between the continuous variables to identity features that were more than 90% correlated with another variable —  these were then omitted from the modeling.
 
-```{r}
+```r
 library(caret)
 set.seed(12)
 nums <- sapply(df, is.numeric)
@@ -50,7 +51,7 @@ cor_matrix <- cor(data.without_na)
 high_cor <- findCorrelation(cor_matrix, 0.9, names = TRUE)
 print(high_cor)
 ```
-###Splitting data into test and training sets
+## Splitting data into test and training sets
 
 I then split the training data into a sub-split of test and training, to verify my out-of-bag accuracy rate was consistent and that I’d avoided overfitting after the model was constructed.
 
@@ -63,7 +64,7 @@ df_test  = subset(df, sample == FALSE)
 ```
 
 
-###Random Forest Specification and Tuning
+## Random Forest specification
 
 Random forest was chosen as the modeling method here for a number of reasons:
 
@@ -72,9 +73,12 @@ Random forest was chosen as the modeling method here for a number of reasons:
 3. The dataset contains numerous important categorical and continuous variables — while random forests are known to favor the selection of continuous features with more options than categorical or binary ones, they do handle both kinds quickly and require almost no preprocessing.
 4. Random forests are relatively simple to tune. With the caret package in R the optimal mtry, splitting rule and minimum tree depth can be easily identified.
 
+### Tuning
+
 Using the caret package I then tuned the random forest for the optimal hyperparameters to maximize accuracy.
 
 ```r
+
 grid <-  expand.grid(mtry = c(3,4,5), min.node.size = c(1, 2,3), splitrule = "gini")
 
 fitControl <- trainControl(method = "CV",
@@ -95,9 +99,10 @@ fit <-  train(
   seed = 1234
 )
 print(fit)
+
 ```
 
-
+### Training model
 
 Maximum CV accuracy was
 
@@ -120,10 +125,9 @@ modelfinal <- ranger(
 predicts <- predict(modelfinalquestionmark, data = _test)
 cf<- table(df_test$is_swing, predicts1$predictions)
 sum(cf[1,1], cf[2,2])/sum(cf[1,1],cf[1,2],cf[2,1],cf[2,2])
+Accuracy on test set is 0.7785082
 
-# Accuracy on test set is 0.7785082
-
-
+```
 
 ### Further Considerations
 
