@@ -1,10 +1,10 @@
 ---
-title: "Modeling: Swing discipline adjustment period following MLB promotion?"
+title: "Does getting called up lead to an change in swing discipline"
 date: 2020-10-30
 tags: [Logistic Classification, Data Science, Baseball]
 header:
   image: "/images/Brewers.png"
-excerpt: "Machine Learning, MLB, Data Science"
+excerpt: "Modeling the effect of promotion on swing patterns of hitters"
 ---
 
 ## Background
