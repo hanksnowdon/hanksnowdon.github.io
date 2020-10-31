@@ -1,7 +1,7 @@
 ---
 title: "Predicting baseball swings with pitch tracking data"
 date: 2020-10-30
-tags: [Modeling]
+tags: [Baseball research]
 header:
   image: "/images/mookie.jpeg"
 excerpt: "Random forest classification predictions"
