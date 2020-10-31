@@ -1,5 +1,5 @@
 ---
-title: "Does getting called up lead to change in swing discipline for baseball players?"
+title: "Does getting called up affect swing discipline in baseball players?"
 date: 2020-10-30
 tags: [Modeling]
 header:
