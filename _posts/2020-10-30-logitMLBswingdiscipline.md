@@ -1,7 +1,7 @@
 ---
 title: "Does getting called up lead to change in swing discipline for baseball players?"
 date: 2020-10-30
-tags: [Modeling
+tags: [Modeling]
 header:
   image: "/images/Brewers.png"
 excerpt: "Modeling the short-term effect of promotion on hitters' swing patterns "
