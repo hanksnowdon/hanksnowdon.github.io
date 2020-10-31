@@ -50,6 +50,8 @@ data.without_na <- na.omit(data.numeric)
 cor_matrix <- cor(data.without_na)
 high_cor <- findCorrelation(cor_matrix, 0.9, names = TRUE)
 print(high_cor)
+
+[1] "vert_break"         "release_speed"      "horz_release_angle"
 ```
 ## Splitting data into test and training sets
 
@@ -104,7 +106,9 @@ print(fit)
 
 ### Training model
 
-Maximum CV accuracy was
+With the above hyperparameters I created the final random forest specification, and verified its performance on my separate testing set.
+
+
 
 ```r
 
@@ -123,9 +127,17 @@ modelfinal <- ranger(
 
 
 predicts <- predict(modelfinalquestionmark, data = _test)
+
+table(df_test$is_swing, predicts1$predictions)
+
+         0      1
+  0 137175  35525
+  1  36109 114607
+
 cf<- table(df_test$is_swing, predicts1$predictions)
 sum(cf[1,1], cf[2,2])/sum(cf[1,1],cf[1,2],cf[2,1],cf[2,2])
-Accuracy on test set is 0.7785082
+
+[1] 0.7785082
 
 ```
 
