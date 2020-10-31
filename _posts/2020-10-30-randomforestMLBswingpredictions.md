@@ -103,7 +103,35 @@ fit <-  train(
 print(fit)
 
 
-# Optimal hyperparameters were mtry = 5, min.node.size = 3
+754533 samples
+    18 predictor
+     2 classes: '0', '1'
+
+No pre-processing
+Resampling: Cross-Validated (5 fold)
+Summary of sample sizes: 603626, 603627, 603625, 603627, 603627
+Resampling results across tuning parameters:
+
+  mtry  min.node.size  Accuracy    Kappa  
+  3     1              0.7775034   0.5529187
+  3     2              0.7776346   0.5531860
+  3     3              0.7779063   0.5536986
+  4     1              0.7778149   0.5535290
+  4     2              0.7776665   0.5532334
+  4     3              0.7774716   0.5528288
+  5     1              0.7778030   0.5535352
+  5     2              0.7775830   0.5530779
+  5     3              0.7776877   0.5532645
+
+Tuning parameter 'splitrule'
+ was held constant at a value
+ of gini
+Accuracy was used to select
+ the optimal model using
+ the largest value.
+The final values used for
+ 3, splitrule = gini
+ and min.node.size = 3.
 ```
 
 ### Training model
@@ -117,14 +145,14 @@ modelfinal <- ranger(
   formula = is_swing ~ pitcher_side + batter_side + outs + count + vert_release_angle + spin_rate+ spin_axis + rel_side + rel_height + extension +  induced_vert_break + horz_break + plate_height + plate_side + zone_speed + vert_approach_angle + horz_approach_angle + pitch_type,
   data = df_train,
   num.trees = 200,
-  mtry = 5,
+  mtry = 3,
   min.node.size = 3,
   splitrule = "gini",
   respect.unordered.factors = TRUE,
   seed = 1234)
 
 
-predicts <- predict(modelfinalquestionmark, data = df_test)
+predicts <- predict(modelfinal, data = df_test)
 
 table(df_test$is_swing, predicts1$predictions)
 
