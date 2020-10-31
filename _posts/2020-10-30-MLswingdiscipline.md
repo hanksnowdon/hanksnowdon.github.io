@@ -1,5 +1,5 @@
 ---
-title: "Is there evidence of an adjustment period for swing discipline following a promotion?"
+title: "Modeling: Swing discipline adjustment period following MLB promotion?"
 date: 2020-10-30
 tags: [Logistic Classification, Data Science, Baseball]
 header:
@@ -572,6 +572,6 @@ As is seen above, it first appears that recently being promoted has no effect on
 
 However, when considering separate models for each pitch type the results are slightly different. Factors like break, speed, approach angle, etc. all have very different effects for different pitches (a 75mph fastball is a very different pitch than a 75mph curveball), so it makes sense to consider these pitches under different models.
 
-While splitting the models by pitch type doesn’t show evidence of an “adjustment period” for most pitches, batters are more likely to swing at change-ups, all other factors constant, if they have recently been promoted. Under the model, a batter is 12.89% more likely to swing at a change-up when they were recently called up, compared to if they had not just been recently promoted.
+While splitting the models by pitch type doesn’t show evidence of an “adjustment period” for most pitches, batters are more likely to swing at change-ups, all other factors constant, if they have recently been promoted. Under the model, a batter is **12.89% more likely** to swing at a change-up when they were recently called up, compared to if they had not just been recently promoted.
 
 This makes sense — change-ups are a pitch that test hitters’ patience at the plate, and recently promoted batters are more likely to press and have less plate discipline on good change-ups.
