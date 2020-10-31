@@ -1,5 +1,5 @@
 ---
-title: "Does getting called up lead to an change in swing discipline"
+title: "Does getting called up lead to change in swing discipline for baseball players?"
 date: 2020-10-30
 tags: [Logistic Classification, Data Science, Baseball]
 header:
