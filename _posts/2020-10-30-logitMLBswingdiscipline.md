@@ -39,7 +39,7 @@ ggplot() + geom_path(data = zone, aes(x=strikex, y=strikez)) + coord_equal() + g
   theme(panel.grid.major.x = element_line(color = "#bdd0d0", size = .4))
 ```
 
-insert image
+<img src="{{ site.url }}{{ site.baseurl }}/images/strikezone" alt="strike zone tag">
 
 Predicting whether or not a better swung at a pitch is clearly more complicated than just looking at the strike zone and pitch type — a myriad of other variables also go into these decisions.
 
