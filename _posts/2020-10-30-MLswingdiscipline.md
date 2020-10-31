@@ -1,5 +1,5 @@
 ---
-title: "Is there evidence of an adjustment period for swing discipline following a promotion?
+title: "Is there evidence of an adjustment period for swing discipline following a promotion?"
 date: 2020-10-30
 tags: [Logistic Classification, Data Science, Baseball]
 header:
